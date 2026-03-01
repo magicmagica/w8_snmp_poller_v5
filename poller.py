@@ -46,3 +46,26 @@ def merge_defaults(defaults, target):
    merged.update(target)
    return merged
 
+# ----------------------------
+# 4. Build SNMPGET command (SNMPv2c)
+# ----------------------------
+
+
+def build_snmpget_cmd(target, oid):
+   version = target.get("snmp_version", "v2c")
+   community = target.get("community", "public")
+   ip = target["ip"]
+   timeout_s = str(target.get("timeout_s", 2.5))
+   retries = str(target.get("retries", 1))
+
+
+   return [
+       "snmpget",
+       "-v", version,
+       "-c", community,
+       "-t", timeout_s,
+       "-r", retries,
+       ip,
+       oid
+   ]
+
