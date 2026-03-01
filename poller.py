@@ -37,5 +37,12 @@ def validate_config(cfg):  # Funktion som kontrollerar config-data
         if "community" not in t and defaults.get("snmp_version", "v2c") == "v2c":  # Krävs för SNMP v2c
             raise ValueError(f"Target {t['name']} missing community for v2c")  # Fel om saknas
 
+# ----------------------------- 
+# 3. Merge defaults with target 
+# -----------------------------
 
+def merge_defaults(defaults, target):
+   merged = defaults.copy()
+   merged.update(target)
+   return merged
 
