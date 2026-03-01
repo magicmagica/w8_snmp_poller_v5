@@ -59,6 +59,9 @@ def merge_defaults(defaults, target):
 
 def build_snmpget_cmd(target, oid):
    version = target.get("snmp_version", "v2c")
+   if version.startswith("v"): #Lägger till if pga fel
+        version = version[1:]  #do "v2c" → "2c"
+
    community = target.get("community", "public")
    ip = target["ip"]
    timeout_s = str(target.get("timeout_s", 2.5))
