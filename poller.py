@@ -5,6 +5,7 @@
 import yaml  # Importerar YAML-bibliotek. Biblioteket används för att läsa och skriva YAML-filer i Python.
 import subprocess # Step 5 run_snmpget()
 import time #Step 5 run_snmpget()
+import logging #Step 6 poll_target
 
 def load_config(path):  # Funktion (load_config) som läser en config-fil, path är sökvägen till konfigurationsfilen. 
     with open(path, "r") as f:  # Open file to read på den angivna sökvägen. "r" = read mode. with = close file automatiskt när blocket är klart. f = fileobject.
@@ -95,4 +96,84 @@ def run_snmpget(cmd, timeout_s):
         elapsed = time.time() - start
         return False, "timeout", elapsed
 
+# -------------- 
+# 6. poll_target   
+# --------------
+
+def poll_target(target):
+   start = time.time()
+   results = {}
+   ok_count = 0
+   fail_count = 0
+
+
+   oids = target.get("oids", [])
+   retries = target.get("retries", 1)
+   timeout_s = target.get("timeout_s", 2.5)
+   budget = target.get("target_budget_s", 10)
+
+
+   for oid in oids:
+       attempts = 0
+       success = False
+       output = None
+
+
+       while attempts <= retries:
+           # Budget check
+           if time.time() - start > budget:
+               logging.warning(f"{target['name']}: budget exceeded")
+               output = "budget_exceeded"
+               break
+
+
+           cmd = build_snmpget_cmd(target, oid)
+           ok, output, elapsed = run_snmpget(cmd, timeout_s)
+
+
+           if ok:
+               success = True
+               break
+
+
+           # Retry only on timeout
+           if output == "timeout":
+               logging.warning(f"{target['name']} {oid}: timeout, retrying...")
+               attempts += 1
+               continue
+
+
+           # Other errors → no retry
+           logging.error(f"{target['name']} {oid}: error {output}")
+           break
+
+
+       # Save result
+       results[oid] = {"ok": success, "value": output}
+
+
+       if success:
+           ok_count += 1
+       else:
+           fail_count += 1
+
+
+   # Determine status
+   if ok_count == len(oids):
+       status = "ok"
+   elif ok_count > 0:
+       status = "partial"
+   else:
+       status = "failed"
+
+
+   return {
+       "name": target["name"],
+       "ip": target["ip"],
+       "status": status,
+       "ok_count": ok_count,
+       "fail_count": fail_count,
+       "runtime_s": round(time.time() - start, 3),
+       "results": results
+   }
 
