@@ -2,10 +2,13 @@
 # 1. Load YAML config 
 # -------------------
 
-import yaml  # Importerar YAML-bibliotek. Biblioteket används för att läsa och skriva YAML-filer i Python.
-import subprocess # Step 5 run_snmpget()
+import argparse #Step 7 main()
+import json #Step 7 main()
+import sys #Step 7 main()
 import time #Step 5 run_snmpget()
 import logging #Step 6 poll_target
+import subprocess #Step 5 run_snmpget()
+import yaml #Importerar YAML-bibliotek. Biblioteket används för att läsa och skriva YAML-filer i Python.
 
 def load_config(path):  # Funktion (load_config) som läser en config-fil, path är sökvägen till konfigurationsfilen. 
     with open(path, "r") as f:  # Open file to read på den angivna sökvägen. "r" = read mode. with = close file automatiskt när blocket är klart. f = fileobject.
@@ -176,4 +179,83 @@ def poll_target(target):
        "runtime_s": round(time.time() - start, 3),
        "results": results
    }
+
+# ---------
+# 7. main() 
+# ---------
+
+def main():
+   parser = argparse.ArgumentParser()
+   parser.add_argument("--config", required=True)
+   parser.add_argument("--out", required=True)
+   parser.add_argument("--log-level", default="INFO")
+   args = parser.parse_args()
+
+
+   logging.basicConfig(
+       level=args.log_level,
+       format="%(asctime)s %(levelname)s %(message)s"
+   )
+
+
+   # Load + validate config
+   try:
+       cfg = load_config(args.config)
+       validate_config(cfg)
+   except Exception as e:
+       logging.error(f"Invalid config: {e}")
+       sys.exit(2)
+
+
+   defaults = cfg.get("defaults", {})
+   targets = cfg["targets"]
+
+
+   logging.info(f"Starting poller, {len(targets)} targets")
+
+
+   run_start = time.time()
+   results = []
+
+
+   for t in targets:
+       merged = merge_defaults(defaults, t)
+       logging.info(f"Polling {merged['name']} ({merged['ip']})")
+       results.append(poll_target(merged))
+
+
+   duration = round(time.time() - run_start, 3)
+
+
+   output = {
+       "timestamp": time.strftime("%Y-%m-%d %H:%M:%S"),
+       "config": args.config,
+       "duration_s": duration,
+       "targets": results
+   }
+
+
+   # Write JSON
+   if args.out == "-":
+       print(json.dumps(output, indent=2))
+   else:
+       with open(args.out, "w") as f:
+           json.dump(output, f, indent=2)
+
+
+   # Exit code logic
+   statuses = [t["status"] for t in results]
+
+
+   if all(s == "failed" for s in statuses):
+       sys.exit(2)
+   if any(s != "ok" for s in statuses):
+       sys.exit(1)
+   sys.exit(0)
+
+
+
+
+if __name__ == "__main__":
+   main()
 
