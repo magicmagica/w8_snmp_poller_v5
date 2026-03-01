@@ -3,6 +3,8 @@
 # -------------------
 
 import yaml  # Importerar YAML-bibliotek. Biblioteket används för att läsa och skriva YAML-filer i Python.
+import subprocess # Step 5 run_snmpget()
+import time #Step 5 run_snmpget()
 
 def load_config(path):  # Funktion (load_config) som läser en config-fil, path är sökvägen till konfigurationsfilen. 
     with open(path, "r") as f:  # Open file to read på den angivna sökvägen. "r" = read mode. with = close file automatiskt när blocket är klart. f = fileobject.
@@ -68,4 +70,29 @@ def build_snmpget_cmd(target, oid):
        ip,
        oid
    ]
+
+# ---------------------------- 
+# 5. Run SNMPGET via subprocess  
+# ----------------------------
+
+def run_snmpget(cmd, timeout_s):
+    start = time.time()
+    try:
+        result = subprocess.run(
+            cmd,
+            capture_output=True,
+            text=True,
+            timeout=timeout_s
+        )
+        elapsed = time.time() - start
+
+        if result.returncode == 0:
+            return True, result.stdout.strip(), elapsed
+        else:
+            return False, result.stderr.strip(), elapsed
+
+    except subprocess.TimeoutExpired:
+        elapsed = time.time() - start
+        return False, "timeout", elapsed
+
 
