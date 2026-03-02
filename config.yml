@@ -1,20 +1,40 @@
 defaults:
-  snmp_version: "v2c"
-  timeout_s: 2.5
-  retries: 1
-  target_budget_s: 10
-  oids:
-    - "sysUpTime.0"
-    - "sysName.0"
+ snmp_version: "v2c"
+ timeout_s: 2.5
+ retries: 1
+ target_budget_s: 10
+ oids:
+   - "sysUpTime.0"
+   - "sysName.0"
+
 
 targets:
-  - name: "switch-251"
-    ip: "172.16.0.251"
-    community: "public"
-    oids:
-      - "sysDescr.0"
-      - "ifOperStatus.1"
+ - name: "switch-251"
+   ip: "172.16.0.251"
+   community: "public"
+   oids:
+     - "sysDescr.0"
+     - "ifOperStatus.1"
 
-  - name: "switch-235"
-    ip: "172.16.0.235"
-    community: "public"
+
+ - name: "switch-235"
+   ip: "172.16.0.235"
+   community: "public"
+   oids:
+     - "sysDescr.0"
+     - "ifOperStatus.1"
+
+
+# - name: "switch-"
+#   ip: "172.16.0."
+#   community: "public"
+#   oids:
+#     - "sysDescr.0"
+#     - "ifOperStatus.1"
+
+# - name: "switch-"
+#   ip: "172.16.0."
+#   community: "public"
+#   oids:
+#     - "sysDescr.0"
+#     - "ifOperStatus.1"
