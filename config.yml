@@ -9,6 +9,7 @@ defaults:
 
 
 targets:
+#Linn, Amanda
  - name: "switch-251"
    ip: "172.16.0.251"
    community: "public"
@@ -16,7 +17,7 @@ targets:
      - "sysDescr.0"
      - "ifOperStatus.1"
 
-
+#Magica
  - name: "switch-235"
    ip: "172.16.0.235"
    community: "public"
@@ -24,7 +25,7 @@ targets:
      - "sysDescr.0"
      - "ifOperStatus.1"
 
-
+#Marla
  - name: "switch-181"
    ip: "172.16.0.181"
    community: "public"
@@ -32,9 +33,10 @@ targets:
      - "sysDescr.0"
      - "ifOperStatus.1"
 
-# - name: "switch-"
-#   ip: "172.16.0."
-#   community: "public"
-#   oids:
-#     - "sysDescr.0"
-#     - "ifOperStatus.1"
+#Felicia
+ - name: "switch-157"
+   ip: "172.16.0.157"
+   community: "public"
+   oids:
+     - "sysDescr.0"
+     - "ifOperStatus.1"

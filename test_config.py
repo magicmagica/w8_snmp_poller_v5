@@ -1,5 +1,4 @@
-# Koden är ett unit test som kontrollerar att validate_config() kastar ett fel när targets saknas i konfigurationen.
-
+# This is a unit test that ensures validate_config() raises an error if targets are missing from the configuration.
 
 #-----------------------------------------
 # Missing targets key → ska ge ValueError:
