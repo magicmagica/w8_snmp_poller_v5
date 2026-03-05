@@ -18,6 +18,7 @@ The poller includes features such as:
 - logging
 - exit codes for monitoring systems
 
+The poller generates detailed warning logs that include device name, IP address, subnet, OID and retry information to simplify troubleshooting and monitoring.
 
 ---
 
