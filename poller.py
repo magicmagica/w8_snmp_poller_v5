@@ -148,9 +148,14 @@ def poll_target(target):                                    # Defines a function
        success = False                                      # Tracks eventually succeed
        output = None                                        # Store the output or error message
      
-        while attempts <= retries:                          # Keeps trying until there is no more retries
+       while attempts <= retries:                          # Keeps trying until there is no more retries
            if time.time() - start > budget:                 # Checks if the total allowed time is used
-               logging.warning(f"{target['name']}: budget exceeded")  # This logs a warning
+                logging.warning(                                                                        #ADDED     
+                    f"event=budget_exceeded device={target['name']} ip={target['ip']} subnet={subnet} " #ADDED
+                    f"budget_s={budget} timeout_s={timeout_s} retries={retries} snmp_id={snmp_id}"      #ADDED
+                )                                                                                       #ADDED
+               #logging.warning(f"{target['name']}: budget exceeded")  # This logs a warning            #OLD
+
                output = "budget_exceeded"                   # Marks the result as budget exceeded
                break                                        # Stops trying this OID
 
@@ -164,7 +169,11 @@ def poll_target(target):                                    # Defines a function
            
            # Retry only on timeout
            if output == "timeout":                          # Checks if the failure was a timeout
-               logging.warning(f"{target['name']} {oid}: timeout, retrying...")  # Logs a retry message
+               logging.warning(                                                                                 #ADDED
+                    f"event=timeout device={target['name']} ip={target['ip']} subnet={subnet} oid={oid} "       #ADDED
+                    f"attempt={attempts+1}/{retries+1} timeout_s={timeout_s} snmp_id={snmp_id} action=retrying" #ADDED
+                )                                                                                               #ADDED
+               #logging.warning(f"{target['name']} {oid}: timeout, retrying...")  # Logs a retry message        #OLD
                attempts += 1                                # Increases the retry counter
                continue                                     # Tries again
 
