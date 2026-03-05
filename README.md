@@ -236,8 +236,6 @@ Default: `INFO`.
 
 Supported values:
 
-- DEBUG
-- INFO
 - WARNING
 - ERROR
 
