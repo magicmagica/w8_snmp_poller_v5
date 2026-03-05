@@ -5,3 +5,5 @@ __pycache__/
 .vscode/
 dist/
 build/
+out.json
+poller.log

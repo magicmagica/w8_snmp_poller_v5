@@ -143,6 +143,9 @@ def poll_target(target):                                    # Defines a function
    timeout_s = target.get("timeout_s", 2.5)                 # Gets the timeout for each SNMP request
    budget = target.get("target_budget_s", 10)               # Gets the total time allowed for this target
 
+   subnet = ".".join(target["ip"].split(".")[:3]) + ".0/24" #ADDED
+   snmp_id = target.get("user") or target.get("community")  #ADDED
+
    for oid in oids:                                         # Loops through each OID we want to poll
        attempts = 0                                         # Counts how many attempts are made
        success = False                                      # Tracks eventually succeed
@@ -155,9 +158,8 @@ def poll_target(target):                                    # Defines a function
                     f"budget_s={budget} timeout_s={timeout_s} retries={retries} snmp_id={snmp_id}"      #ADDED
                 )                                                                                       #ADDED
                #logging.warning(f"{target['name']}: budget exceeded")  # This logs a warning            #OLD
-
-               output = "budget_exceeded"                   # Marks the result as budget exceeded
-               break                                        # Stops trying this OID
+                output = "budget_exceeded"                   # Marks the result as budget exceeded
+                break                                        # Stops trying this OID
 
            cmd = build_snmpget_cmd(target, oid)             # Builds the SNMPGET command for this OID
            ok, output, elapsed = run_snmpget(cmd, timeout_s)  # This runs the command and gets the result
