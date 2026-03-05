@@ -1,4 +1,4 @@
-README.md (för din labb)
+README.md
 # SNMP Poller
 
 ## About the application
